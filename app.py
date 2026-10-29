@@ -7,6 +7,18 @@ def calculate_total_bill(price, quantity):
         raise ValueError("Price and quantity cannot be negative")
     return round(price * quantity, 2)
 
+def calculate_discounted_total(price, quantity, discount_percent):
+    subtotal = calculate_total_bill(price, quantity)
+    discount_amount = subtotal * (discount_percent / 100)
+    final_total = subtotal - discount_amount
+
+    return {
+        "subtotal": round(subtotal, 2),
+        "discount_percent": discount_percent,
+        "discount_amount": round(discount_amount, 2),
+        "final_total": round(final_total, 2)
+    }
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template_string("""
@@ -20,7 +32,10 @@ def index():
                 <label>Quantity:</label><br>
                 <input type="number" name="quantity" min="1" required><br><br>
 
-                <button type="submit">Calculate Total</button>
+                <label>Discount (%):</label><br>
+                <input type="number" name="discount_percent" min="0" max="100" value="0" required><br><br>
+
+                <button type="submit">Calculate Bill</button>
             </form>
         </body>
     </html>
@@ -30,12 +45,10 @@ def index():
 def bill():
     price = float(request.form["price"])
     quantity = int(request.form["quantity"])
-    total = calculate_total_bill(price, quantity)
-    return jsonify({
-        "price": price,
-        "quantity": quantity,
-        "total_bill": total
-    })
+    discount_percent = float(request.form.get("discount_percent", 0))
+
+    result = calculate_discounted_total(price, quantity, discount_percent)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

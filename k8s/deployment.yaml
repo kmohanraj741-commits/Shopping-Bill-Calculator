@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shopping-bill-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shopping-bill-app
+  template:
+    metadata:
+      labels:
+        app: shopping-bill-app
+    spec:
+      containers:
+      - name: shopping-bill-app
+        image: ${IMAGE_NAME}:${TAG}
+        ports:
+        - containerPort: 5000
